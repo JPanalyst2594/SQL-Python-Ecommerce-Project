@@ -12,292 +12,294 @@ db = mysql.connector.connect(
     database='Ecommers'
 )
 cursor = db.cursor()
-# //////////////////////////////////////////   Basic Query
-# #List all unique cities where customers are located.
+//////////////////////////////////////////   Basic Query
+#List all unique cities where customers are located.
 
-# query = """select distinct customer_city from customers"""
+query = """select distinct customer_city from customers"""
 
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df =pd.DataFrame(data)
-# df.head()
-# print(df)
+cursor.execute(query)
+data =cursor.fetchall()
+df =pd.DataFrame(data)
+df.head()
+print(df)
 
-# Count the number of orders placed in 2017.
+Count the number of orders placed in 2017.
 
-# query = """select count(order_id) from orders where year(order_purchase_timestamp)=2017"""
+query = """select count(order_id) from orders where year(order_purchase_timestamp)=2017"""
 
-# cursor.execute(query)
-# data =cursor.fetchall()
-# data[0][0]
-# print(data)
-
-
-
-
-
-
-# import mysql.connector
-
-# # Connect to MySQL
-# conn = mysql.connector.connect(
-#     host='localhost',
-#     user='root',
-#     password='J@ip2594',
-#     database='Ecommers'
-# )
-# cursor = conn.cursor()
-
-# # Replace 'orders' with your table name and 'order_id' with your duplicate-identifying column
-# delete_duplicates_query = """
-# DELETE t1 FROM orders t1
-# JOIN orders t2 
-# ON 
-#     t1.order_id = t2.order_id AND 
-#     t1.order_id > t2.order_id;
-# """
-
-# cursor.execute(delete_duplicates_query)
-# conn.commit()
-# conn.close()
-
-# print("✅ Duplicate rows deleted.")
+cursor.execute(query)
+data =cursor.fetchall()
+data[0][0]
+print(data)
 
 
 
 
 
-# Find the total sales per category.
 
-# query = """select upper(products.product_category)as cateogry , round(sum(payments.payment_value),2) as sales from products
-#  join order_items on products.product_id = order_items.product_id 
-#  join payments on payments.order_id = order_items.order_id
-#  group by product_category;"""
+import mysql.connector
 
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df = pd.DataFrame(data, columns=["category","sales"])
-# print(df)
+# Connect to MySQL
+conn = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    password='J@ip2594',
+    database='Ecommers'
+)
+cursor = conn.cursor()
 
+# Replace 'orders' with your table name and 'order_id' with your duplicate-identifying column
+delete_duplicates_query = """
+DELETE t1 FROM orders t1
+JOIN orders t2 
+ON 
+    t1.order_id = t2.order_id AND 
+    t1.order_id > t2.order_id;
+"""
 
-####Count the number of customers from each state.
+cursor.execute(delete_duplicates_query)
+conn.commit()
+conn.close()
 
-# query = """ select distinct(customer_state),count(customer_id) from customers group by customer_state"""
-
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df = pd.DataFrame(data, columns=["category","sales"])
-# df = df.sort_values(by='sales',ascending=False)
-# plt.figure(figsize=(20,5)) 
-# plt.bar(df["category"],df["sales"])
-# plt.xticks(rotation=90)
-# plt.show()
-# /////////////////////////////////////////////////////////////  Intermidate Query
-# Calculate the number of orders per month in 2018.
-
-# query = """ select monthname(order_purchase_timestamp)  months,count(order_id) from orders 
-# where year(order_purchase_timestamp)  =2018 group by months"""
-
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df = pd.DataFrame( data, columns = ["Months","order_id"])
-# o = ["january","fabuary","march","april","may","june","july","Augest",'sept','oct',"nov",'dec'] 
-# ax=sns.barplot(x = df["Months"],y = df["order_id"],data = df, order = o , color="red")
-# plt.xticks(rotation=45)
-# ax.bar_label(ax.containers[0])
-# plt.show()
+print("✅ Duplicate rows deleted.")
 
 
-# Find the average number of products per order, grouped by customer city.
 
 
-# query = """  with count_per_order as (select orders.order_id ,orders.customer_id, count(order_items.order_id) as ior
-# from orders 
-# join order_items on orders.order_id = order_items.order_id
-# group by orders.order_id,orders.customer_id)
+
+##Find the total sales per category.
+
+query = """select upper(products.product_category)as cateogry , round(sum(payments.payment_value),2) as sales from products
+ join order_items on products.product_id = order_items.product_id 
+ join payments on payments.order_id = order_items.order_id
+ group by product_category;"""
+
+cursor.execute(query)
+data =cursor.fetchall()
+df = pd.DataFrame(data, columns=["category","sales"])
+print(df)
+
+
+###Count the number of customers from each state.
+
+query = """ select distinct(customer_state),count(customer_id) from customers group by customer_state"""
+
+cursor.execute(query)
+data =cursor.fetchall()
+df = pd.DataFrame(data, columns=["category","sales"])
+df = df.sort_values(by='sales',ascending=False)
+plt.figure(figsize=(20,5)) 
+plt.bar(df["category"],df["sales"])
+plt.xticks(rotation=90)
+plt.show()
+/////////////////////////////////////////////////////////////  Intermidate Query
+
+#######Calculate the number of orders per month in 2018.
+
+query = """ select monthname(order_purchase_timestamp)  months,count(order_id) from orders 
+where year(order_purchase_timestamp)  =2018 group by months"""
+
+cursor.execute(query)
+data =cursor.fetchall()
+df = pd.DataFrame( data, columns = ["Months","order_id"])
+o = ["january","fabuary","march","april","may","june","july","Augest",'sept','oct',"nov",'dec'] 
+ax=sns.barplot(x = df["Months"],y = df["order_id"],data = df, order = o , color="red")
+plt.xticks(rotation=45)
+ax.bar_label(ax.containers[0])
+plt.show()
+
+
+####Find the average number of products per order, grouped by customer city.
+
+
+query = """  with count_per_order as (select orders.order_id ,orders.customer_id, count(order_items.order_id) as ior
+from orders 
+join order_items on orders.order_id = order_items.order_id
+group by orders.order_id,orders.customer_id)
  
-#  select	customers.customer_city,round(avg(count_per_order.ior),2)
-#  from customers
-#  join count_per_order on customers.customer_id =count_per_order.customer_id
-#  group by customers.customer_city;
-# """
+ select	customers.customer_city,round(avg(count_per_order.ior),2)
+ from customers
+ join count_per_order on customers.customer_id =count_per_order.customer_id
+ group by customers.customer_city;
+"""
 
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df =pd.DataFrame(data,columns=["customer_city","avg_count"])
-# print(df)
+cursor.execute(query)
+data =cursor.fetchall()
+df =pd.DataFrame(data,columns=["customer_city","avg_count"])
+print(df)
 
-###### Calculate the percentage of total revenue contributed by each product category.
-
-
-# query = """select upper(products.product_category) category, 
-# round((sum(payments.payment_value)/(select sum(payment_value) from payments))*100,2) sales_percentage
-# from products join order_items 
-# on products.product_id = order_items.product_id
-# join payments 
-# on payments.order_id = order_items.order_id
-# group by category order by sales_percentage desc"""
+##### Calculate the percentage of total revenue contributed by each product category.
 
 
-# cursor.execute(query)
-# data = cursor.fetchall()
-# df = pd.DataFrame(data)
-# print(df)
-
-# Identify the correlation between product price and the number of times a product has been purchased.
-
-# query="""select products.product_category,count(order_items.product_id),round( avg(order_items.price),2)
-#  from products 
-#  join order_items on
-#  products.product_id=order_items.product_id
-#  group by products.product_category;"""
-
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df = pd.DataFrame(data,columns=["category","order_count","avg_price"])
-# df["order_count"] = pd.to_numeric(df["order_count"])
-# df["avg_price"] = pd.to_numeric(df["avg_price"])
-# corelatn=np.corrcoef(df["order_count"],df["avg_price"])[0,1]
-# print("coorelation:",corelatn)
+query = """select upper(products.product_category) category, 
+round((sum(payments.payment_value)/(select sum(payment_value) from payments))*100,2) sales_percentage
+from products join order_items 
+on products.product_id = order_items.product_id
+join payments 
+on payments.order_id = order_items.order_id
+group by category order by sales_percentage desc"""
 
 
-####Calculate the total revenue generated by each seller, and rank them by revenue.
+cursor.execute(query)
+data = cursor.fetchall()
+df = pd.DataFrame(data)
+print(df)
 
-# query=""" select * , dense_rank()
-# over 
-# 	(order by Revenue desc) as Ranks 
-# from 
-# (select  order_items.seller_id,
-# 		round(sum(payments.payment_value),2) 
-#         as Revenue 
+####Identify the correlation between product price and the number of times a product has been purchased.
+
+query="""select products.product_category,count(order_items.product_id),round( avg(order_items.price),2)
+ from products 
+ join order_items on
+ products.product_id=order_items.product_id
+ group by products.product_category;"""
+
+cursor.execute(query)
+data =cursor.fetchall()
+df = pd.DataFrame(data,columns=["category","order_count","avg_price"])
+df["order_count"] = pd.to_numeric(df["order_count"])
+df["avg_price"] = pd.to_numeric(df["avg_price"])
+corelatn=np.corrcoef(df["order_count"],df["avg_price"])[0,1]
+print("coorelation:",corelatn)
+
+
+###Calculate the total revenue generated by each seller, and rank them by revenue.
+
+query=""" select * , dense_rank()
+over 
+	(order by Revenue desc) as Ranks 
+from 
+(select  order_items.seller_id,
+		round(sum(payments.payment_value),2) 
+        as Revenue 
 				 
-# from 
-# 		order_items 
-# join 
-# 		payments 
-# on 
-# 		order_items.order_id =  payments.order_id
-# group by
-# 		order_items.seller_id ) as a"""
+from 
+		order_items 
+join 
+		payments 
+on 
+		order_items.order_id =  payments.order_id
+group by
+		order_items.seller_id ) as a"""
 
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df = pd.DataFrame(data, columns=["seller_id","total_revenue","Rank"])
-# data=df.head()
-# sns.barplot(x="seller_id", y = "total_revenue",data=df)
-# plt.xticks(rotation=90)
-# plt.show()
+cursor.execute(query)
+data =cursor.fetchall()
+df = pd.DataFrame(data, columns=["seller_id","total_revenue","Rank"])
+data=df.head()
+sns.barplot(x="seller_id", y = "total_revenue",data=df)
+plt.xticks(rotation=90)
+plt.show()
 
-# ////////////////Advance QUery
-
-
-# //////////   Calculate the moving average of order values for each customer over their order history.
+////////////////Advance QUery
 
 
-# query ="""select customer_id,order_purchase_timestamp,payment,
-#                 avg(payment)
-#                 over(partition by customer_id 
-#                 order by order_purchase_timestamp 
-#                 rows between 2 preceding and current row) as Moving_avg from
+//////////   Calculate the moving average of order values for each customer over their order history.
 
-#         (select  orders.customer_id,
-# 		        orders.order_purchase_timestamp,
-#                 payments.payment_value as payment
-# from	orders 
+query ="""select customer_id,order_purchase_timestamp,payment,
+        avg(payment) over(partition by customer_id 
+                order by order_purchase_timestamp 
+                rows between 2 preceding and current row) as Moving_avg from
+
+        (select  orders.customer_id,
+		        orders.order_purchase_timestamp,
+                payments.payment_value as payment
+from	orders 
 	
-#         join payments on 
-# 			    orders.order_id = payments.order_id)as a;"""
+        join payments on 
+			    orders.order_id = payments.order_id)as a;"""
 
-# cursor.execute(query)
-# data = cursor.fetchall()
-# df = pd.DataFrame(data,columns=["customer_id","Order_purchase_timestamp","payment","Moving_avg"])
-# print(df)
-
-
-# query ="""select years, months,payments,sum(payments) 
-# 		over (order by years,months) as cumulative_Sales 
-# from 
-# (select year(orders.order_purchase_timestamp) as years,
-# month(orders.order_purchase_timestamp)as months,
-# round(sum(payment_value)) as payments
-# from orders join payments on 
-# orders.order_id = payments.order_id
-# group by years, months) as T"""
-
-# cursor.execute(query)
-# data = cursor.fetchall()
-# df = pd.DataFrame(data,columns=["years","months","payments","cumulative_sales"])
-# df["date"] = pd.to_datetime(df["years"].astype(str) + "-" + df["months"].astype(str) + "-01")
-# df = df.sort_values("date")
-# plt.figure(figsize=(8,3))
-# sns.lineplot(x="date",y="cumulative_sales",data=df, markers=0)
-# plt.show()
+cursor.execute(query)
+data = cursor.fetchall()
+df = pd.DataFrame(data,columns=["customer_id","Order_purchase_timestamp","payment","Moving_avg"])
+print(df)
 
 
-
-#####-------------Calculate the year-over-year growth rate of total sales
-
-# query="""with a as(
-# select year(orders.order_purchase_timestamp) as years,round( sum(payment_value),2) as payments from orders join payments on 
-# orders.order_id = payments.order_id
-# group by years)
-
-# select years,(payments-lag(payments,1) over (order by years))/ (payments-lag(payments,1) over (order by years))* 100 
-# from a"""
-
-# cursor.execute(query)
-# data = cursor.fetchall()
-# df =pd.DataFrame(data,columns=["year","yoy_%_growth"])
-# print(df)
+###Calculate the cumulative sales per month for each year.
 
 
-########---------------Calculate the retention rate of customers,
-#  defined as the percentage of customers who make another purchase within 6 months of their first purchase.
+query ="""select years, months,payments,sum(payments) 
+		over (order by years,months) as cumulative_Sales 
+from 
+(select year(orders.order_purchase_timestamp) as years,
+month(orders.order_purchase_timestamp)as months,
+round(sum(payment_value)) as payments
+from orders join payments on 
+orders.order_id = payments.order_id
+group by years, months) as T"""
 
-# query="""with first_order as 
-# (
-#  select 
-# 		customers.customer_id,
-#         min(order_purchase_timestamp) as first_order_date 
-# from orders 
-# join customers on customers.customer_id = orders.customer_id
-# group by customers.customer_id
-# ),
-
-# order_within_6_month as 
-# (
-# select 
-# 		orders.customer_id,
-#         orders.order_purchase_timestamp
-# from orders 
-# join first_order  on first_order.customer_id = orders.customer_id
-# where orders.order_purchase_timestamp > first_order.first_order_date
-# and orders.order_purchase_timestamp <= date_add(first_order.first_order_date,interval 6 month)
-
-# ), 
-# retained_customers as(
-# 	select distinct customer_id from order_within_6_month
-# ),
-# total_customer as 
-# (
-#  select count(distinct customer_id) as total from first_order
-# )
-# select
-# 		(select count(*) from retained_customers) as customer_retained,
-# 		(select total from total_customer) as total_customer,
-# round(
-# 		(select count(*) from retained_customers)/
-# 		(select total from total_customer) * 100,2
-#         )as total_6_month_retention_rate"""
-
-# cursor.execute(query)
-# data =cursor.fetchall()
-# df =pd.DataFrame(data,columns=["customer_retained","total_customer","6_month_retention_rate"])
-# print(df)
+cursor.execute(query)
+data = cursor.fetchall()
+df = pd.DataFrame(data,columns=["years","months","payments","cumulative_sales"])
+df["date"] = pd.to_datetime(df["years"].astype(str) + "-" + df["months"].astype(str) + "-01")
+df = df.sort_values("date")
+plt.figure(figsize=(8,3))
+sns.lineplot(x="date",y="cumulative_sales",data=df, markers=0)
+plt.show()
 
 
 
-#########--------Identify the top 3 customers who spent the most money in each year.----
+####-------------Calculate the year-over-year growth rate of total sales
+
+query="""with a as(
+select year(orders.order_purchase_timestamp) as years,round( sum(payment_value),2) as payments from orders join payments on 
+orders.order_id = payments.order_id
+group by years)
+
+select years,(payments-lag(payments,1) over (order by years))/ (payments-lag(payments,1) over (order by years))* 100 
+from a"""
+
+cursor.execute(query)
+data = cursor.fetchall()
+df =pd.DataFrame(data,columns=["year","yoy_%_growth"])
+print(df)
+
+
+#######---------------Calculate the retention rate of customers,defined as the percentage of customers who make another purchase within 6 months of their first purchase.
+
+query="""with first_order as 
+(
+ select 
+		customers.customer_id,
+        min(order_purchase_timestamp) as first_order_date 
+from orders 
+join customers on customers.customer_id = orders.customer_id
+group by customers.customer_id
+),
+
+order_within_6_month as 
+(
+select 
+		orders.customer_id,
+        orders.order_purchase_timestamp
+from orders 
+join first_order  on first_order.customer_id = orders.customer_id
+where orders.order_purchase_timestamp > first_order.first_order_date
+and orders.order_purchase_timestamp <= date_add(first_order.first_order_date,interval 6 month)
+
+), 
+retained_customers as(
+	select distinct customer_id from order_within_6_month
+),
+total_customer as 
+(
+ select count(distinct customer_id) as total from first_order
+)
+select
+		(select count(*) from retained_customers) as customer_retained,
+		(select total from total_customer) as total_customer,
+round(
+		(select count(*) from retained_customers)/
+		(select total from total_customer) * 100,2
+        )as total_6_month_retention_rate"""
+
+cursor.execute(query)
+data =cursor.fetchall()
+df =pd.DataFrame(data,columns=["customer_retained","total_customer","6_month_retention_rate"])
+print(df)
+
+
+
+########--------Identify the top 3 customers who spent the most money in each year.----
+
 
 query="""select years,id,total_money_spent,d_ranks from
 
